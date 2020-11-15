@@ -6,6 +6,7 @@ if __name__ == "__main__":
 	from ui import setupUI
 
 from keylogger import proc_m, proc_k
+from screenshot import screenshot
 
 #Simple function to get current minute as a unique string
 def getMinuteID():
@@ -59,13 +60,13 @@ if __name__ == "__main__":
 			sec = datetime.now().second
 			
 			if STATE_RUNNING and STATE_RECORDING and screenshots[0] == None and sec >= 15:
-				pass #todo screenshot
+				screenshots[0] = screenshot(getMinuteID()+'a', STATE_RECORDING)
 			
 			if STATE_RUNNING and screenshots[1] == None and sec >= 30:
-				pass
+				screenshots[1] = screenshot(getMinuteID()+'b', STATE_RECORDING)
 			
 			if STATE_RUNNING and STATE_RECORDING and screenshots[2] == None and sec >= 45:
-				pass #todo screenshot
+				screenshots[2] = screenshot(getMinuteID()+'c', STATE_RECORDING)
 			
 			
 			sleep(1) #Not sleeping for entire minutes makes sure computing time doesn't introduce a delay
@@ -77,8 +78,9 @@ if __name__ == "__main__":
 		
 		while not(keyloggerQueue.empty()):
 			msg = keyloggerQueue.get()
-			#todo handle toggle hotkeys
 			data += [msg]
+		
+		#todo send data to database
 		
 		while not(uiinq.empty()):
 			msg = uiinq.get()

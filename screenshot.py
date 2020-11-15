@@ -1,4 +1,5 @@
-from PIL import Image, ImageGrab
+from PIL import Image#, ImageGrab
+import pyscreenshot as ImageGrab
 from time import time
 
 
