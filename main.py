@@ -64,13 +64,13 @@ if __name__ == "__main__":
 			
 			sec = datetime.now().second
 			
-			if STATE_RUNNING and STATE_RECORDING and screenshots[0] == None and sec >= 15:
+			if STATE_RUNNING and screenshots[0] == None and sec >= 15:
 				screenshots[0] = screenshot(0)
 			
 			if STATE_RUNNING and screenshots[1] == None and sec >= 30:
 				screenshots[1] = screenshot(1)
 			
-			if STATE_RUNNING and STATE_RECORDING and screenshots[2] == None and sec >= 45:
+			if STATE_RUNNING and screenshots[2] == None and sec >= 45:
 				screenshots[2] = screenshot(2)
 			
 			
@@ -94,6 +94,8 @@ if __name__ == "__main__":
 			data = processMeasurementData(data, dominantColor)
 			
 			myGuess = answerThis(data)
+			
+			print(myGuess)
 		
 			minuteToDB(minuteIDName, data, myGuess)
 			

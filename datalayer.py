@@ -1,6 +1,11 @@
 #Datalayer.py converts incoming data into a format that can be stored or used in the MLP
 from math import tanh
 from statistics import mean
+import time
+
+from db import listActivities, actIDToName, setCorrectAnswer, getMarkedMinutes, addActivity
+from classifier import learnThese
+import os
 
 def processMeasurementData(data, dominantColor):
 	mouseData = [0,0,0,0] # Click, RightClick, Middle, Scroll
@@ -62,5 +67,33 @@ def processMeasurementData(data, dominantColor):
 	
 	return mData
 
+def teach():
+	activities = listActivities()
+	for act in activities:
+		os.mkdir("screenshots/"+actIDToName(act))
+	
+	print("Move each screenshot into the right folder or delete them if unsure")
+	#os.startfile("screenshots")
 
+	input("Press enter when done")
+	
+	teachTime = int(time.time())
+	
+	for act in activities:
+		markedMinutes = os.listdir("screenshots/"+actIDToName(act))
+		markedMinutes = [x.replace(".png", "") for x in markedMinutes]
+		
+		for minute in markedMinutes:
+			setCorrectAnswer(minute, act, teachTime)
+	
+	
+	trainingData, trainingAnswers = getMarkedMinutes()
+		
+	learnThese(trainingData, trainingAnswers, None, None)
 
+def createActivities():
+	acts = input().split(' ')
+	for act in acts:
+		addActivity(act)
+	
+	

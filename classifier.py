@@ -21,14 +21,14 @@ def learnThese(trainingData, trainingAnswers, testingSet, testingAnswers):
 	if False:
 		testPredictions = mylittlepony.predict(testingSet)
 		
-		print(mean([1 if testPredictions[i] == testingAnswers[i] else 0]))
+		print('Testing: ', mean([1 if testPredictions[i] == testingAnswers[i] else 0]))
 	
 	joblib.dump(mylittlepony, "model.joblib")
 
 def answerThis(data):
 	try:
 		#print(str(mylittlepony.predict_proba( [data] )))
-		return mylittlepony.predict([data])[0]
+		return int(mylittlepony.predict([data])[0])
 	except:
 		return -1 #untrained model
 
