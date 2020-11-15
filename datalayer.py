@@ -61,30 +61,6 @@ def processMeasurementData(data, dominantColor):
 	)
 	
 	return mData
-	
-	'''
-	def addMinute(time, screenColors, mouseData, kbData, mouseMovement, screenshotTaken):
-	cur.execute("insert into minutesmeta (id) values (?)", (time,))
 
-	cur.execute("insert into minutesmouse (id, movecount, posaveragex, posaveragey, lefts, rights, mids) values (?,?,?,?,?,?,?)",
-	(time, len(mouseMovement), mean([x[0] for x in mouseMovement]), mean([x[1] for x in mouseMovement]), mouseData[0], mouseData[1], mouseData[2]))
-	cur.execute("insert into minuteskeyboard (id, letters, numbers, whitespace, other) values (?,?,?,?,?)",
-	tuple([time]+kbData))
-	cur.execute("insert into minutesscreen (id, red, green, blue) values (?,?,?,?)",
-	tuple([time]+list(screenColors)))
-	
-	db.commit()
-	
-	'''
-	'''
-	addMinute(time, screenColors, mouseData, kbData, mouseMovement, recordModeEh)
-	
-	formatted = _getCurData(time)[0]
-	
-	id = classifier.answerThis(formatted)[0]
-	print(id)
-	
-	storeMyGuess(time, id)
-	
-	return actIDToName(int(id))
-	'''
+
+

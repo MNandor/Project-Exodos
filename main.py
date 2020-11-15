@@ -5,6 +5,8 @@ from time import sleep
 if __name__ == "__main__":
 	from ui import setupUI
 	from datalayer import processMeasurementData
+	from db import addMinute as minuteToDB, actIDToName
+	from classifier import answerThis
 
 from keylogger import proc_m, proc_k
 from screenshot import screenshot, finalizeScreenshot
@@ -55,7 +57,6 @@ if __name__ == "__main__":
 		#If also recording: two additional screenshots taken at :15 and :45 for identification
 		screenshots = [None, None, None]
 		
-		#We only save screenshots in recording mode
 		minuteIDName = getMinuteID()
 		
 		#Processing happens at the end of minute
@@ -87,13 +88,17 @@ if __name__ == "__main__":
 		
 		
 		if STATE_RUNNING:
+			#We only save screenshots in recording mode but dominant color is still collected
 			dominantColor = finalizeScreenshot(minuteIDName if STATE_RECORDING else None)
 			
-			text = processMeasurementData(data, dominantColor)
-			uioutq.put(str(text))
-			print(text)
+			data = processMeasurementData(data, dominantColor)
+			
+			myGuess = answerThis(data)
 		
-			#todo send data to database
+			minuteToDB(minuteIDName, data, myGuess)
+			
+			uioutq.put(actIDToName(myGuess))
+			print(data)
 	
 	
 	
