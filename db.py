@@ -1,7 +1,6 @@
 import sqlite3
 import os
 import time
-from statistics import mean
 from shutil import rmtree
 import classifier
 
@@ -9,47 +8,6 @@ import classifier
 db = sqlite3.connect('db.db')
 cur = db.cursor()
 
-def sendData(time, data, screenColors, screenshotTaken):
-	mouseData = [0,0,0,0] # Click, RightClick, Middle, Scroll
-	kbData = [0,0,0,0] # Letters, Numbers, Whitespace, Other
-	mouseMovement = [] #Each movement (math done later)
-	
-	
-	movC = 0
-	cliC = 0
-	preC = 0
-	
-	for i in data:
-		if i[0] == "M":
-			coords = i.split(" ")[1:]
-			coords = [int(x) for x in coords]
-			mouseMovement += [coords]
-		if i[0] == "C":
-			w = i.split(" ")[1]
-			if w == "Button.left": mouseData[0] += 1
-			if w == "Button.right": mouseData[1] += 1
-			if w == "Button.middle": mouseData[2] += 1
-		if i[0] == "K":
-			w = i.split(" ")[1]
-			if "'" in w:
-				w = w.replace("'", "")
-				if w.isalpha(): kbData[0] += 1
-				elif w.isnumeric(): kbData[1] += 1
-			elif w in ["Key.tab", "Key.space", "Key.enter"]:
-				kbData[2] += 1
-			else:
-				kbData[3] += 1
-	
-	addMinute(time, screenColors, mouseData, kbData, mouseMovement, screenshotTaken)
-	
-	formatted = _getCurData(time)[0]
-	
-	id = classifier.answerThis(formatted)[0]
-	print(id)
-	
-	storeMyGuess(time, id)
-	
-	return actIDToName(int(id))
 
 
 def getMinutes():
@@ -66,6 +24,7 @@ def storeMyGuess(time, activity):
 	cur.execute("update minutesmeta set myguess = ? where id = ?", (int(activity), time))
 	db.commit()
 
+'''
 def addMinute(time, screenColors, mouseData, kbData, mouseMovement, screenshotTaken):
 	cur.execute("insert into minutesmeta (id) values (?)", (time,))
 	if len(mouseMovement) == 0:
@@ -78,6 +37,7 @@ def addMinute(time, screenColors, mouseData, kbData, mouseMovement, screenshotTa
 	tuple([time]+list(screenColors)))
 	
 	db.commit()
+'''
 	
 
 

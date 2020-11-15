@@ -1,5 +1,4 @@
 from sklearn.neural_network import MLPClassifier
-from math import tanh
 import joblib
 
 mylittlepony = None

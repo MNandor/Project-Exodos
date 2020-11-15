@@ -32,8 +32,14 @@ def finalizeScreenshot(name):
 	dst.paste(ims[2], (0, ims[0].height+ims[1].height))
 	
 	
+	#ColorThief takes a lot of time on large images, scale them down
+	#Doing so also saves disk space
+	dst = dst.resize((dst.width//4, dst.height//4))
+	
+	
 	if name is not None:
 		dst.save(f'screenshots/{name}.png')
+	
 	
 	b = io.BytesIO()
 	dst.save(b, "PNG")

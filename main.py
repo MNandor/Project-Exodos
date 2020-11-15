@@ -4,6 +4,7 @@ import multiprocessing
 from time import sleep
 if __name__ == "__main__":
 	from ui import setupUI
+	from datalayer import processMeasurementData
 
 from keylogger import proc_m, proc_k
 from screenshot import screenshot, finalizeScreenshot
@@ -55,7 +56,7 @@ if __name__ == "__main__":
 		screenshots = [None, None, None]
 		
 		#We only save screenshots in recording mode
-		nameOfScreenshot = getMinuteID() if STATE_RECORDING else None
+		minuteIDName = getMinuteID()
 		
 		#Processing happens at the end of minute
 		while datetime.now().minute == curMin:
@@ -77,18 +78,25 @@ if __name__ == "__main__":
 		#Exiting inner while loop means end of the minute, handle everything
 		#Note: computational delay doesn't cause problems because measurement is on a separate thread
 		
-		
-		if STATE_RUNNING:
-			dominantColor = finalizeScreenshot(nameOfScreenshot)
-			
-
+		#Collect measured data
+		#Note: if not running, this empties queue
 		data = []
-		
 		while not(keyloggerQueue.empty()):
 			msg = keyloggerQueue.get()
 			data += [msg]
 		
-		#todo send data to database
+		
+		if STATE_RUNNING:
+			dominantColor = finalizeScreenshot(minuteIDName if STATE_RECORDING else None)
+			
+			text = processMeasurementData(data, dominantColor)
+			uioutq.put(str(text))
+			print(text)
+		
+			#todo send data to database
+	
+	
+	
 		#todo don't save minute when we stopped running/recording?
 		while not(uiinq.empty()):
 			msg = uiinq.get()
