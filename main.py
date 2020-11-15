@@ -6,7 +6,7 @@ if __name__ == "__main__":
 	from ui import setupUI
 
 from keylogger import proc_m, proc_k
-from screenshot import screenshot
+from screenshot import screenshot, finalizeScreenshot
 
 #Simple function to get current minute as a unique string
 def getMinuteID():
@@ -54,25 +54,33 @@ if __name__ == "__main__":
 		#If also recording: two additional screenshots taken at :15 and :45 for identification
 		screenshots = [None, None, None]
 		
+		#We only save screenshots in recording mode
+		nameOfScreenshot = getMinuteID() if STATE_RECORDING else None
+		
 		#Processing happens at the end of minute
 		while datetime.now().minute == curMin:
 			
 			sec = datetime.now().second
 			
 			if STATE_RUNNING and STATE_RECORDING and screenshots[0] == None and sec >= 15:
-				screenshots[0] = screenshot(getMinuteID()+'a', STATE_RECORDING)
+				screenshots[0] = screenshot(0)
 			
 			if STATE_RUNNING and screenshots[1] == None and sec >= 30:
-				screenshots[1] = screenshot(getMinuteID()+'b', STATE_RECORDING)
+				screenshots[1] = screenshot(1)
 			
 			if STATE_RUNNING and STATE_RECORDING and screenshots[2] == None and sec >= 45:
-				screenshots[2] = screenshot(getMinuteID()+'c', STATE_RECORDING)
+				screenshots[2] = screenshot(2)
 			
 			
 			sleep(1) #Not sleeping for entire minutes makes sure computing time doesn't introduce a delay
 
 		#Exiting inner while loop means end of the minute, handle everything
 		#Note: computational delay doesn't cause problems because measurement is on a separate thread
+		
+		
+		if STATE_RUNNING:
+			dominantColor = finalizeScreenshot(nameOfScreenshot)
+			
 
 		data = []
 		
@@ -81,7 +89,7 @@ if __name__ == "__main__":
 			data += [msg]
 		
 		#todo send data to database
-		
+		#todo don't save minute when we stopped running/recording?
 		while not(uiinq.empty()):
 			msg = uiinq.get()
 			if msg == 'running':
