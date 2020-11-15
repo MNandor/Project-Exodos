@@ -7,18 +7,54 @@ from PyQt5.QtCore import *
 label = None
 queue = None
 reverseQueue = None
+b1 = None
+b2 = None
 
 def updateLabel():
+	global b1, b2
+
 	while not(queue.empty()):
 		msg = queue.get()
-		label.setText(msg)
-	
+		if len(msg) > 0 and msg[0] == '_':
+			if msg == '_running True': b1.setText('Running')
+			if msg == '_running False': b1.setText('Not Running')
+			if msg == '_recording True': b2.setText('Recording')
+			if msg == '_recording False': b2.setText('Not Recording')
+		else:
+			label.setText(msg)
 
+
+
+def toggleRunning():
+	global b1
+	global reverseQueue
+	
+	#todo or (reverse button press)
+	
+	if b1.text() == 'Not Running':
+		b1.setText('Starting Running')
+	else:
+		b1.setText('Stopping Running')
+	
+	reverseQueue.put('running')
+
+def toggleRecording():
+	global b2
+	global reverseQueue
+	
+	
+	if b2.text() == 'Not Recording':
+		b2.setText('Starting Recording')
+	else:
+		b2.setText('Stopping Recording')
+	
+	reverseQueue.put('recording')
 
 def setupUI(q, reverseQ):
 	global label
 	global queue
 	global reverseQueue
+	global b1, b2
 	queue = q
 	reverseQueue = reverseQ
 	
@@ -29,8 +65,10 @@ def setupUI(q, reverseQ):
 	layout1 = QVBoxLayout()
 	layout2 = QVBoxLayout()
 
-	b1 = QPushButton("Run")
-	b2 = QPushButton("Teach")
+	b1 = QPushButton("Not Running")
+	b1.clicked.connect(toggleRunning)
+	b2 = QPushButton("Not Recording")
+	b2.clicked.connect(toggleRecording)
 
 
 	layout1.addWidget(b1)

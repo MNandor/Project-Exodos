@@ -1,102 +1,98 @@
+#Main.py is the main thread responsible for launching the other threads and communicating between them
 from datetime import datetime
 import multiprocessing
 from time import sleep
-from screenshot import screenshot
-from keylogger import *
 if __name__ == "__main__":
 	from ui import setupUI
-	from db import sendData
 
+from keylogger import proc_m, proc_k
 
+#Simple function to get current minute as a unique string
 def getMinuteID():
 	return datetime.now().strftime("%Y_%m_%d_%H_%M")
 
+def message(s):
+	print(s)
 
-#Main Process handles data coming from two subprocesses in a Queue
 
 
-
+#Necessary for multiprocessing
 if __name__ == "__main__":
-	
-	running = True
-	takeScreenshots = True
 
-	queue = multiprocessing.Queue()
+	STATE_RUNNING = False #If measurements are being made
+	STATE_RECORDING = False #Only relevant when running, takes screenshots to assist manual teaching and marks data for learning
 	
-	uioutq = multiprocessing.Queue() #ui out queue
-	uiinq = multiprocessing.Queue() #ui in queue
+	keyloggerQueue = multiprocessing.Queue() #Measuring processes write to this
 	
-	print("starting")
+	uioutq = multiprocessing.Queue() #UI out queue
+	uiinq = multiprocessing.Queue() #UI in queue
+	
+	message('starting subprocesses')
 	
 	#Mouse process
-	pm = multiprocessing.Process(target=proc_m, args = (queue,))
+	pm = multiprocessing.Process(target=proc_m, args = (keyloggerQueue,))
 	pm.start()
 	
 	#Keyboard process
-	pk = multiprocessing.Process(target=proc_k, args = (queue,))
+	pk = multiprocessing.Process(target=proc_k, args = (keyloggerQueue,))
 	pk.start()
 	
 	#UI
 	ui = multiprocessing.Process(target=setupUI, args = (uioutq, uiinq))
 	ui.start()
 	
-	print("waiting")
+	message('program ready')
 	
 	#Starting time
-	curMin = datetime.now().minute
+	curMin = datetime.now().minute	
+	#Note: the program only measures full minutes. Therefore the minute it is started is always ignored.
 	
-	
-	#Note: Since starting minute is not full, it is not measured
-	if True:
-		#Wait for minute start
-		while datetime.now().minute == curMin:
-			sleep(1)
-		#Empty queue
-		while not(queue.empty()):
-			msg = queue.get()
-
-	curMin = datetime.now().minute
-	print("running")
-
-	while running:
-		hitMiddle = False
-		print(f"Starting {getMinuteID()}")
+	while True: #Each real time minute is one loop iteration
 		
-		screenData = None
-		minID = getMinuteID()
+		#If running: a screenshot is taken at :30 for color data
+		#If also recording: two additional screenshots taken at :15 and :45 for identification
+		screenshots = [None, None, None]
+		
+		#Processing happens at the end of minute
+		while datetime.now().minute == curMin:
+			
+			sec = datetime.now().second
+			
+			if STATE_RUNNING and STATE_RECORDING and screenshots[0] == None and sec >= 15:
+				pass #todo screenshot
+			
+			if STATE_RUNNING and screenshots[1] == None and sec >= 30:
+				pass
+			
+			if STATE_RUNNING and STATE_RECORDING and screenshots[2] == None and sec >= 45:
+				pass #todo screenshot
+			
+			
+			sleep(1) #Not sleeping for entire minutes makes sure computing time doesn't introduce a delay
+
+		#Exiting inner while loop means end of the minute, handle everything
+		#Note: computational delay doesn't cause problems because measurement is on a separate thread
+
 		data = []
 		
-		
-		#Sleep seconds to compensate for computing time skew
-		while datetime.now().minute == curMin:
-			sleep(1)
-			
-			
-			
-			#Take screenshot
-			if not(hitMiddle) and datetime.now().second >= 30:
-				hitMiddle = True
-				screenData = screenshot(getMinuteID(), takeScreenshots)
-				
-		
-		curMin = datetime.now().minute
-		
-		
-		while not(uiinq.empty()):
-			uiinq.get()
-		
-		#Handle all keylogs
-		while not(queue.empty()):
-			msg = queue.get()
+		while not(keyloggerQueue.empty()):
+			msg = keyloggerQueue.get()
+			#todo handle toggle hotkeys
 			data += [msg]
 		
-		text = sendData(minID, data, screenData, takeScreenshots)
-		uioutq.put(text)
-		print(text)
+		while not(uiinq.empty()):
+			msg = uiinq.get()
+			if msg == 'running':
+				STATE_RUNNING = not(STATE_RUNNING)
+			elif msg == 'recording':
+				STATE_RECORDING = not(STATE_RECORDING)
+		
+		uioutq.put(f'_running {str(STATE_RUNNING)}')
+		uioutq.put(f'_recording {str(STATE_RECORDING)}')
 		
 		
-		
-	
+		curMin = datetime.now().minute	
+
 	#Kill children
 	pm.terminate()
 	pk.terminate()
@@ -104,4 +100,40 @@ if __name__ == "__main__":
 	pm.join()
 	pk.join()
 	
-	print("end")
+	#todo also kill ui
+	
+	message("end")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

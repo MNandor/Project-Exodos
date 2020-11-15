@@ -1,9 +1,10 @@
+#Two subprocesses log keyboard and mouse usage
 from pynput.mouse import Listener as ML
 from pynput.keyboard import Listener as KL
-#Two subprocesses log keyboard and mouse usage
 
 queue = None
 
+#Todo consider logging position at regular intervals instead of when mouse is moved
 def mouseMove(x, y):
 	queue.put(f"M {x} {y}")
 
