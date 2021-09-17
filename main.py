@@ -1,3 +1,4 @@
+#!/bin/python3
 #Main.py is the main thread responsible for launching the other threads and communicating between them
 from datetime import datetime
 import multiprocessing
