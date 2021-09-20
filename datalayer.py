@@ -32,7 +32,7 @@ def processMeasurementData(data, dominantColor):
 			if "'" in w:
 				w = w.replace("'", "")
 				if w.isalpha(): kbData[0] += 1
-				elif w.isnumeric(): kbData[1] += 1 #todo else other
+				elif w.isnumeric(): kbData[1] += 1
 			elif w in ["Key.tab", "Key.space", "Key.enter"]:	
 				kbData[2] += 1
 			else:
