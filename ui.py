@@ -28,37 +28,49 @@ def updateLabel():
 def toggleRunning():
 	global b1
 	global reverseQueue
-	
+
 	#todo or (reverse button press)
-	
+
 	if b1.text() == 'Not Running':
 		b1.setText('Starting Running')
 	else:
 		b1.setText('Stopping Running')
-	
+
 	reverseQueue.put('running')
 
 def toggleRecording():
 	global b2
 	global reverseQueue
-	
-	
+
+
 	if b2.text() == 'Not Recording':
 		b2.setText('Starting Recording')
 	else:
 		b2.setText('Stopping Recording')
-	
+
 	reverseQueue.put('recording')
+
+def normalQuit():
+	global app
+	global reverseQueue
+
+	reverseQueue.put('exit')
+
+	app.quit()
+
+app = None
 
 def setupUI(q, reverseQ):
 	global label
 	global queue
 	global reverseQueue
 	global b1, b2
+	global app
+
 	queue = q
 	reverseQueue = reverseQ
-	
-	
+
+
 	app = QApplication([])
 	window = QWidget()
 	_layout = QHBoxLayout()
@@ -79,8 +91,8 @@ def setupUI(q, reverseQ):
 	font.setPointSize(20)
 	label.setFont(font)
 	label.setStyleSheet("* { background-color: rgba(0, 0, 0, 0); color: #FF007F; }")
-	
-	
+
+
 	layout2.addWidget(label)
 
 
@@ -89,31 +101,33 @@ def setupUI(q, reverseQ):
 	window.setAttribute(Qt.WA_NoSystemBackground, True)
 	window.setWindowFlags(Qt.FramelessWindowHint)
 	window.move(0,100)
-	
+
 	bb1 = QPushButton("Add")
 	bb2 = QPushButton("Teach")
-	bb3 = QPushButton("Learn")
-	
+	bb3 = QPushButton("Quit")
+
 	bb1.setMaximumWidth(40)
 	bb2.setMaximumWidth(40)
 	bb3.setMaximumWidth(40)
-	
+
+	bb3.clicked.connect(normalQuit)
+
 	layout3.addWidget(bb1)
 	layout3.addWidget(bb2)
 	layout3.addWidget(bb3)
-	
+
 	layout1.addLayout(layout3)
 
 	_layout.addLayout(layout1)
 	_layout.addLayout(layout2)
 	window.setLayout(_layout)
 	window.show()
-	
+
 	timer = QTimer()
 	timer.timeout.connect(updateLabel)
 	timer.start(100)
-	
-	
+
+
 	app.exec_()
 
 	window=0
