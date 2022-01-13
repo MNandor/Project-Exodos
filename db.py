@@ -54,6 +54,11 @@ def listActivities():
 	l = [x[0] for x in cur.fetchall()]
 	return l
 
+def listActivityNames():
+	cur.execute("select name from activities")
+	l = [x[0] for x in cur.fetchall()]
+	return l
+
 def setCorrectAnswer(minuteID, activityID, teachTime):
 	cur.execute('update minutes set correctanswer = ?, teachTime = ? where id = ?', (activityID, teachTime, minuteID))
 	db.commit()

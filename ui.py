@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 #import PyQt5.QtCore as Qt
 
+from db import addActivity, listActivityNames
+
 label = None
 queue = None
 reverseQueue = None
@@ -37,6 +39,48 @@ def toggleRunning():
 		b1.setText('Stopping Running')
 
 	reverseQueue.put('running')
+
+
+
+dialogET = None
+popup = None
+def createNewActivity():
+	global dialogET
+	global popup
+	cur = listActivityNames()
+	dlg = QDialog()
+	
+	popup = dlg
+
+	dialogET = QLineEdit(dlg)
+	btn = QPushButton('Ok', dlg)
+	btn2 = QPushButton('Cancel', dlg)
+	btn.move(50,50)
+	btn2.move(0,50)
+	ql = QLabel('\n'.join(cur), dlg)
+	ql.move(50, 100)
+
+
+	btn.clicked.connect(finishCreatingNew)
+	btn2.clicked.connect(closePopup)
+
+
+	dlg.resize(120, 400)
+
+	dlg.exec_()
+
+	# dlg.setWindowModality(Qt.ApplicationModal)
+
+def finishCreatingNew():
+	global dialogET
+	name = dialogET.text()
+	addActivity(name)
+	closePopup()
+
+def closePopup():
+	global popup
+	popup.close()
+
 
 def toggleRecording():
 	global b2
@@ -110,6 +154,7 @@ def setupUI(q, reverseQ):
 	bb2.setMaximumWidth(40)
 	bb3.setMaximumWidth(40)
 
+	bb1.clicked.connect(createNewActivity)
 	bb3.clicked.connect(normalQuit)
 
 	layout3.addWidget(bb1)
