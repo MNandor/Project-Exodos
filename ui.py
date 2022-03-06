@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 #import PyQt5.QtCore as Qt
 
-from db import addActivity, listActivityNames
+from db import addActivity, listActivityNames, listActivityPairs
 
 label = None
 queue = None
@@ -47,7 +47,7 @@ popup = None
 def createNewActivity():
 	global dialogET
 	global popup
-	cur = listActivityNames()
+	cur = [f'{x[0]} - {x[1]}' for x in listActivityPairs()]
 	dlg = QDialog()
 	
 	popup = dlg

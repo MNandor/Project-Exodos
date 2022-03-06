@@ -59,6 +59,12 @@ def listActivityNames():
 	l = [x[0] for x in cur.fetchall()]
 	return l
 
+def listActivityPairs():
+	cur.execute("select activities.name, count(activities.id) from activities left join minutes on minutes.correctanswer = activities.id group by activities.name")
+	l = cur.fetchall()
+	print(l)
+	return l
+
 def setCorrectAnswer(minuteID, activityID, teachTime):
 	cur.execute('update minutes set correctanswer = ?, teachTime = ? where id = ?', (activityID, teachTime, minuteID))
 	db.commit()
